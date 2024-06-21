@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="selectClist">
+		SELECT *
+			FROM CATEGORY
+		ORDER BY 1	
+	</entry>
+	<entry key="insertCategory">
+		INSERT INTO CATEGORY
+		VALUES(?,?)		
+	</entry>
+	<entry key="updateCategory">
+		UPDATE CATEGORY
+		   SET CATEGORY_NAME = ?
+		 WHERE CATEGORY_NO = ?
+	</entry>
+	<entry key="selectClist2">
+		SELECT *
+		  FROM CATEGORY
+		 WHERE CATEGORY_NO = ?
+	</entry>
+	<entry key="deleteCategory">
+		DELETE FROM CATEGORY
+		WHERE CATEGORY_NO=?
+		  AND CATEGORY_NAME=?		
+	</entry>
+</properties>

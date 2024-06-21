@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<!-- 
+		=====관심글 폴더 관련 쿼리문 시작 =====
+	-->
+	<!--최상단 폴더 조회 -->
+	<entry key="selectFolder">
+		SELECT FOLDER_NO
+			  ,FOLDER_NAME
+			  ,CREATE_DATE
+		FROM FOLDER
+		WHERE MEMBER_NO = ? 
+		AND UP_FOLDER_NO IS NULL
+	</entry>
+	<!-- 하위 폴더 조회 -->
+	<entry key="selectSubFolder">
+		SELECT FOLDER_NO
+			  ,FOLDER_NAME
+			  ,CREATE_DATE
+		FROM FOLDER
+		WHERE MEMBER_NO = ? 
+		AND UP_FOLDER_NO = ?
+	</entry>
+	<!-- 뒤로가기 버튼 눌렀을때 상위 폴더 정보 조회 -->
+	<entry key="selectBackFolder">
+		SELECT FOLDER_NO
+			  ,FOLDER_NAME
+			  ,CREATE_DATE
+			  ,UP_FOLDER_NO
+		FROM FOLDER
+		WHERE UP_FOLDER_NO = (SELECT UP_FOLDER_NO
+		                    FROM FOLDER
+		                    WHERE MEMBER_NO = ?
+		                    AND FOLDER_NO = ?)
+	</entry>
+	<!-- 
+		======관심글 폴더 관련 쿼리문 끝=====
+	-->
+	
+	<!-- 
+		======관심글 게시글 관련 쿼리문 시작=====
+	-->
+	<!-- 최상단에 있는 게시글 조회 -->
+	<entry key="selectTopInterest">
+		SELECT I.POST_NO,TITLE,POST_DATE
+		FROM INTEREST_POST I
+		JOIN POST P ON(I.POST_NO = P.POST_NO)
+		LEFT JOIN FOLDER F ON (F.FOLDER_NO = I.FOLDER_NO)
+		WHERE I.FOLDER_NO IS NULL
+		AND I.MEMBER_NO=?
+		AND P.STATUS = 'Y'
+	</entry>
+	<!-- 폴더내에 있는 게시글 조회 -->
+	<entry key="selectSubInterest">
+		SELECT I.POST_NO,TITLE,POST_DATE
+		FROM INTEREST_POST I
+		JOIN POST P ON(I.POST_NO = P.POST_NO)
+		LEFT JOIN FOLDER F ON (F.FOLDER_NO = I.FOLDER_NO)
+		WHERE I.FOLDER_NO = ?
+		AND I.MEMBER_NO= ?
+		AND P.STATUS = 'Y'
+	</entry>
+	<!-- 뒤로가기 버튼 눌렀을때 상위폴더에 있는 게시글 조회 -->
+	<entry key="selectBackInterest">
+		SELECT I.POST_NO,TITLE,POST_DATE
+		FROM INTEREST_POST I
+		JOIN POST P ON(I.POST_NO = P.POST_NO)
+		LEFT JOIN FOLDER F ON (F.FOLDER_NO = I.FOLDER_NO)
+		WHERE NVL(I.FOLDER_NO,0) = (SELECT NVL(UP_FOLDER_NO,0) UP_FOLDER_NO
+                            FROM FOLDER
+                            WHERE FOLDER_NO = ?)
+		AND I.MEMBER_NO = ?
+		AND P.STATUS = 'Y'
+	</entry>
+	<!-- 
+		======관심글 게시글 관련 쿼리문 끝=====
+	-->
+	
+	
+	<!-- 
+		======좋아요 한 게시글 관련 쿼리문 시작=====
+	-->
+	<!-- 좋아요 한 게시글 리스트 조회 -->
+	<entry key="selectList">
+		SELECT  L.POST_NO
+                   ,CATEGORY_NAME
+                   ,TITLE
+                   ,MEMBER_NICKNAME
+                   ,COUNT
+                   ,POST_DATE     
+            FROM LIKE_POST L
+            JOIN MEMBER M ON(L.MEMBER_NO = M.MEMBER_NO)
+            JOIN POST P ON(L.POST_NO = P.POST_NO)
+            JOIN CATEGORY C ON(P.CATEGORY_NO = C.CATEGORY_NO)
+            WHERE L.MEMBER_NO = ?
+            AND P.STATUS = 'Y'
+	</entry>
+	<!-- 
+		======좋아요 한 게시글 관련 쿼리문 끝=====
+	-->
+	
+	<!-- 
+		======내가 쓴 게시글 관련 쿼리문 시작=====
+	-->
+	<!-- 내가 쓴 게시글 조회 -->
+	<entry key="selectMyPostList">
+		SELECT  POST_NO
+               ,CATEGORY_NAME
+               ,TITLE
+               ,MEMBER_NICKNAME
+               ,COUNT
+               ,POST_DATE     
+            FROM POST P
+            JOIN MEMBER M ON(P.MEMBER_NO = M.MEMBER_NO)
+            JOIN CATEGORY C ON(P.CATEGORY_NO = C.CATEGORY_NO)
+            WHERE P.MEMBER_NO = ?
+            AND P.STATUS = 'Y'
+	</entry>
+	<!-- 
+		======내가 쓴 게시글 관련 쿼리문 끝=====
+	-->
+	
+	
+	<!-- 
+		======내가 쓴 댓글 관련 쿼리문 시작=====
+	-->
+	<!-- 내가 쓴 댓글 조회 -->
+	<entry key="selectMyCommentList">
+		SELECT COMMENT_NO
+			  ,CATEGORY_NAME
+			  ,COMMENT_CONTENT
+			  ,MEMBER_NICKNAME
+			  ,COMMENT_DATE
+			  ,TITLE
+		FROM COMMENT_TABLE CT
+		JOIN POST P ON(CT.POST_NO = P.POST_NO)
+		JOIN MEMBER M ON(CT.COMMENT_WRITER_NO = M.MEMBER_NO)
+		JOIN CATEGORY C ON(P.CATEGORY_NO = C.CATEGORY_NO)
+		WHERE CT.COMMENT_WRITER_NO = ?
+		AND CT.STATUS = 'Y'
+	</entry>
+	<!-- 
+		======내가 쓴 댓글 관련 쿼리문 끝=====
+	-->
+	<!-- 
+		======내 관심글 삭제 관련 쿼리문 시작=====
+	-->
+	<entry key="selectDeleteFolder">
+		SELECT FOLDER_NO FROM FOLDER WHERE UP_FOLDER_NO = ? AND MEMBER_NO = ?
+	</entry>
+	<entry key="deleteInterestFolder">
+		DELETE FOLDER
+		WHERE MEMBER_NO = ?
+		AND FOLDER_NO = ?
+	</entry>
+	<entry key="deleteInterestPost">
+		DELETE INTEREST_POST
+		WHERE MEMBER_NO = ?
+		AND POST_NO = ?
+	</entry>
+	<!-- 
+		======내 관심글 삭제 관련 쿼리문 끝=====
+	-->
+	<!-- 
+		======내 좋아요 삭제 관련 쿼리문 시작=====
+	-->
+	<entry key="deleteLike">
+		DELETE Like_POST
+		WHERE MEMBER_NO = ?
+		AND POST_NO = ?
+	</entry>
+	<!-- 
+		======내 좋아요 삭제 관련 쿼리문 끝=====
+	-->
+	<!-- 
+		======내가 쓴 글 삭제 관련 쿼리문 시작=====
+	-->
+	<entry key="deleteMyPost">
+		UPDATE POST
+		SET STATUS = 'N'
+		WHERE MEMBER_NO = ?
+        AND POST_NO = ?
+	</entry>
+	<!-- 
+		======내가 쓴 글 삭제 관련 쿼리문 끝=====
+	-->
+	<!-- 
+		======내가 쓴 댓글 삭제 관련 쿼리문 시작=====
+	-->
+	<entry key="deleteMyComment">
+		UPDATE COMMENT_TABLE
+		SET STATUS = 'N'
+		WHERE COMMENT_WRITER_NO = ?
+        AND COMMENT_NO = ?
+	</entry>
+	<!-- 
+		======내가 쓴 댓글 삭제 관련 쿼리문 시작=====
+	-->
+	
+	<!-- 
+		======검색 관련 쿼리문 시작=====
+	-->
+	
+	<entry key="searchInterest">
+		SELECT I.POST_NO,TITLE,POST_DATE
+		FROM INTEREST_POST I
+		JOIN POST P ON(I.POST_NO = P.POST_NO)
+		WHERE I.MEMBER_NO = ?
+        AND P.TITLE LIKE ?
+		AND P.STATUS = 'Y'
+	</entry>
+	
+	<entry key="searchLike">
+		SELECT  L.POST_NO
+                   ,CATEGORY_NAME
+                   ,TITLE
+                   ,MEMBER_NICKNAME
+                   ,COUNT
+                   ,POST_DATE     
+            FROM LIKE_POST L
+            JOIN MEMBER M ON(L.MEMBER_NO = M.MEMBER_NO)
+            JOIN POST P ON(L.POST_NO = P.POST_NO)
+            JOIN CATEGORY C ON(P.CATEGORY_NO = C.CATEGORY_NO)
+            WHERE L.MEMBER_NO = ?
+            AND TITLE LIKE ?
+            AND P.STATUS = 'Y'
+	</entry>
+	
+	<entry key="searchMyPost">
+		SELECT  POST_NO
+               ,CATEGORY_NAME
+               ,TITLE
+               ,MEMBER_NICKNAME
+               ,COUNT
+               ,POST_DATE     
+            FROM POST P
+            JOIN MEMBER M ON(P.MEMBER_NO = M.MEMBER_NO)
+            JOIN CATEGORY C ON(P.CATEGORY_NO = C.CATEGORY_NO)
+            WHERE P.MEMBER_NO = ?
+            AND TITLE LIKE ?
+            AND P.STATUS = 'Y'
+	</entry>
+	
+	<entry key="searchMyComment">
+		SELECT COMMENT_NO
+			  ,CATEGORY_NAME
+			  ,COMMENT_CONTENT
+			  ,MEMBER_NICKNAME
+			  ,COMMENT_DATE
+			  ,TITLE
+		FROM COMMENT_TABLE CT
+		JOIN POST P ON(CT.POST_NO = P.POST_NO)
+		JOIN MEMBER M ON(CT.COMMENT_WRITER_NO = M.MEMBER_NO)
+		JOIN CATEGORY C ON(P.CATEGORY_NO = C.CATEGORY_NO)
+		WHERE CT.COMMENT_WRITER_NO = ?
+		AND COMMENT_CONTENT LIKE ?
+		AND CT.STATUS = 'Y'
+	</entry>
+	<!-- 
+		======검색 관련 쿼리문 시작=====
+	-->
+	<!-- 폴더 추가 -->
+	<entry key="addFolder">
+		INSERT INTO FOLDER VALUES(SEQ_FNO.NEXTVAL,?,?,?,SYSDATE)
+	</entry>
+	
+	<!-- 내 정보 변경 -->
+	<entry key="updateMember">
+		UPDATE MEMBER SET MEMBER_NAME = ?
+                 ,MEMBER_NICKNAME = ?
+                 ,MEMBER_EMAIL = ?
+             WHERE MEMBER_ID = ?
+             AND STATUS = 'Y'
+	</entry>
+	<!--id로 유저 정보 가져오기 -->
+	<entry key="selectMember">
+		SELECT *
+		FROM MEMBER
+		WHERE MEMBER_ID = ?
+		AND STATUS = 'Y'
+	</entry>
+	<!-- 비밀번호 변경 -->
+	<entry key="updatePwd">
+		UPDATE MEMBER SET MEMBER_PWD = ?
+		WHERE MEMBER_PWD = ?
+		AND MEMBER_NO = ?
+		AND STATUS = 'Y'
+	</entry>
+	<!-- 회원 탈퇴 -->
+	<entry key="deleteMember">
+		UPDATE MEMBER SET STATUS = 'N'
+		WHERE MEMBER_NO = ?
+		AND MEMBER_PWD = ?
+		AND STATUS = 'Y'
+	</entry>
+	
+	<!-- 내가 갖고있는 폴더들 이름 가져오기 -->
+	<entry key="selectMyFolders">
+		SELECT FOLDER_NAME,FOLDER_NO
+		FROM FOLDER
+		WHERE MEMBER_NO = ?
+	</entry>
+	<!-- 관심 폴더 이동시키기 -->
+	<entry key="folderMove">
+		UPDATE FOLDER SET UP_FOLDER_NO = ?
+		WHERE MEMBER_NO = ?
+		AND FOLDER_NO = ?
+		
+	</entry>
+	<!-- 관심 게시글 이동시키기 -->
+	<entry key="postMove">
+		UPDATE INTEREST_POST SET FOLDER_NO = ?
+		WHERE MEMBER_NO = ?
+		AND POST_NO = ?
+	</entry>
+</properties>

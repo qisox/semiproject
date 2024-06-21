@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	
+	<entry key="listCount">
+		SELECT COUNT(*) COUNT
+		FROM COMPLAIN
+		WHERE STATUS = 'Y'
+	</entry>
+
+
+	<!-- 건의사항 조회 -->
+	<entry key="selectComplainList">
+		  SELECT *
+		  FROM(
+		  SELECT COMPLAIN_NO,COMPLAIN_CATEGORY,COMPLAIN_TITLE,MEMBER_NICKNAME,COUNT,COMPLAIN_DATE
+		  FROM COMPLAIN C
+		  JOIN MEMBER M ON (M.MEMBER_NICKNAME = C.COMPLAIN_WRITER)
+		  WHERE C.STATUS ='Y'
+		  ORDER BY COMPLAIN_NO DESC)
+		  WHERE COMPLAIN_NO BETWEEN ? AND ?
+		  
+	
+	</entry>
+	
+	
+	<!-- 건의사항 상세보기 -->
+	<entry key="selectComplain">
+	SELECT COMPLAIN_NO
+	,COMPLAIN_CATEGORY
+	,COMPLAIN_TITLE
+	,COMPLAIN_CONTENT
+	,COMPLAIN_WRITER
+	,C.COUNT
+	,COMPLAIN_DATE
+	,C.STATUS,
+	A.REF_BNO,
+	A.ORIGIN_NAME,
+	A.CHANGE_NAME,
+	A.FILE_PATH
+	FROM COMPLAIN C
+	LEFT JOIN COMATTACHMENT A ON C.COMPLAIN_NO = A.REF_BNO
+	WHERE COMPLAIN_NO = ? AND C.STATUS = 'Y'
+	</entry>
+	
+		<entry key="selectAttachment2">
+		SELECT FILE_NO
+			  ,ORIGIN_NAME
+			  ,CHANGE_NAME
+			  ,FILE_PATH
+		FROM COMATTACHMENT
+		WHERE REF_BNO = ?
+	</entry>
+	
+	<!-- 건의사항 조회수증가 -->
+	
+	<entry key="increaseCount2">
+	       UPDATE COMPLAIN
+          SET COUNT = COUNT +1
+          WHERE COMPLAIN_NO= ?
+	</entry>
+	
+	<!-- 건의사항 글쓰기 -->
+	
+<entry key="insertComplain">
+    INSERT INTO COMPLAIN (COMPLAIN_NO
+    					, COMPLAIN_CATEGORY
+    					, COMPLAIN_TITLE
+    					, COMPLAIN_CONTENT
+    					, COMPLAIN_WRITER)
+    VALUES(SEQ_CPNO.NEXTVAL, ?, ?, ?, ?)
+</entry>
+	
+	<entry key="updateComplain">
+	UPDATE COMPLAIN
+	SET COMPLAIN_CATEGORY = ?
+    ,COMPLAIN_TITLE = ?
+    ,COMPLAIN_CONTENT = ?
+    WHERE COMPLAIN_NO = ?
+    AND STATUS = 'Y'
+    
+	</entry>
+	<entry key="deleteComplain">
+	UPDATE COMPLAIN
+	SET STATUS = 'N'
+	WHERE COMPLAIN_NO = ?
+	
+	</entry>
+		<!-- 첨부파일 등록 -->
+		
+		
+	<entry key="insertAttachment2">
+		
+	
+		INSERT INTO COMATTACHMENT(FILE_NO
+							  ,REF_BNO
+							  ,ORIGIN_NAME
+							  ,CHANGE_NAME
+							  ,FILE_PATH
+							  ,FILE_LEVEL)
+				    VALUES(SEQ_CANO.NEXTVAL
+				    		,SEQ_CPNO.CURRVAL
+				    		,?
+				    		,?
+				    		,?
+				    		,3)
+	</entry>
+	
+		<entry key="updateAttachment2">
+		UPDATE COMATTACHMENT
+		SET ORIGIN_NAME = ?
+		   ,CHANGE_NAME = ?
+		   ,FILE_PATH = ?
+		   ,UPLOAD_DATE = SYSDATE
+		WHERE FILE_NO = ?
+		AND STATUS = 'Y'
+		
+	</entry>
+	
+	<entry key="insertNewAttachment2">
+	INSERT INTO COMATTACHMENT(FILE_NO
+						  ,REF_BNO
+						  ,ORIGIN_NAME
+						  ,CHANGE_NAME
+						  ,FILE_PATH)
+          	VALUES(SEQ_CANO.NEXTVAL
+           		 		,?
+          			 	,?
+           			 	,?
+           			 	,?)
+	</entry>
+	
+	
+	<!-- 댓글관련 -->
+	
+	
+	<!-- 댓글 조회 -->
+	<entry key="selectReplyList">
+			SELECT REPLY_NO
+		, MEMBER_NICKNAME
+		, REPLY_CONTENT
+		, REPLY_DATE
+		FROM REPLY R
+		JOIN MEMBER M ON(M.MEMBER_NO =
+		R.REPLY_WRITER_NO)
+		WHERE COMPLAIN_NO = ?
+	</entry>
+	
+	<entry key="insertReply">
+	INSERT INTO REPLY(REPLY_NO,
+		COMPLAIN_NO,
+		REPLY_WRITER_NO,
+		REPLY_CONTENT)
+		VALUES (SEQ_RNO.NEXTVAL,
+		?,
+		?,
+		?)
+	</entry>
+	<entry key="deleteReply">
+		DELETE
+		FROM REPLY
+		WHERE COMPLAIN_NO = ?
+		AND REPLY_NO = ?
+	</entry>
+
+
+
+
+
+
+</properties>

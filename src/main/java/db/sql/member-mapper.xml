@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="insertMember">
+		INSERT INTO MEMBER(MEMBER_NO
+						  ,MEMBER_ID
+						  ,MEMBER_PWD
+						  ,MEMBER_NAME
+						  ,MEMBER_NICKNAME
+						  ,MEMBER_EMAIL)
+				  VALUES(SEQ_MNO.NEXTVAL
+				  		,?
+				  		,?
+				  		,?
+				  		,?
+				  		,?
+				  		)	
+	</entry>
+	<entry key="loginMember">
+		SELECT *
+		FROM MEMBER
+		WHERE MEMBER_ID = ?
+		AND MEMBER_PWD = ?
+		AND STATUS = 'Y'
+	</entry>
+	<entry key="checkId">
+		SELECT COUNT(*) COUNT
+		FROM MEMBER
+		WHERE MEMBER_ID = ?
+		AND STATUS = 'Y'
+	</entry>
+	<entry key="checkNick">
+		SELECT COUNT(*) COUNT
+		FROM MEMBER
+		WHERE MEMBER_NICKNAME = ?
+		AND STATUS = 'Y'
+	</entry>
+	<entry key="findId">
+		SELECT MEMBER_ID
+		FROM MEMBER
+		WHERE MEMBER_NICKNAME = ?
+		AND MEMBER_EMAIL = ?
+		AND STATUS = 'Y'
+	</entry>
+	<entry key="findPw">
+		SELECT MEMBER_PWD
+		FROM MEMBER
+		WHERE MEMBER_NAME = ?
+		AND MEMBER_ID = ?
+		AND MEMBER_EMAIL = ?
+		AND STATUS = 'Y'
+	</entry>
+	<entry key="profileImage">
+		SELECT IMAGE_PATH
+		FROM MEMBER M
+		JOIN IMAGE I ON M.IMAGE_NO = I.IMAGE_NO
+		WHERE MEMBER_ID = ?
+		AND M.STATUS = 'Y'
+	</entry>
+</properties>

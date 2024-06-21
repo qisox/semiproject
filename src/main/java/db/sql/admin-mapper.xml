@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="listCount"> <!-- Member count -->
+		SELECT COUNT(*) COUNT
+		  FROM MEMBER
+	</entry>
+	<entry key="selectUserList"> <!-- 관리자 Member 전체 조회 -->
+   	    SELECT *
+		FROM (SELECT ROWNUM RNUM,A.*
+        FROM (SELECT MEMBER_NO
+		      ,MEMBER_ID
+		      ,MEMBER_NAME
+		      ,MEMBER_NICKNAME
+		      ,MEMBER_EMAIL
+		      ,MEMBER_ENROLL_DATE
+		      ,MEMBER_GRADE
+		      ,STATUS
+   		  FROM MEMBER) A
+        )
+   		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	<entry key="updateMember"> <!-- 관리자 Member status, Status 수정 -->
+		UPDATE MEMBER 
+		   SET MEMBER_GRADE = ?
+		      ,STATUS = ?
+	     WHERE MEMBER_NO = ?
+	</entry>
+	<entry key="selectDisableUser"> <!-- update 후 Member 조회 조회 -->
+		SELECT MEMBER_NO
+		  FROM DISABLE
+		 WHERE MEMBER_NO = ?
+	</entry>
+	<entry key="findUser"> <!-- 유저정보페이지 검색 -->
+		SELECT MEMBER_NO
+	      ,MEMBER_ID
+	      ,MEMBER_NAME
+	      ,MEMBER_NICKNAME
+	      ,MEMBER_EMAIL
+	      ,MEMBER_ENROLL_DATE
+	      ,MEMBER_GRADE
+	      ,STATUS
+		   FROM MEMBER
+		   WHERE 
+	</entry>	
+	<entry key="selectDisable">  <!-- 정지회원 조회 -->
+		SELECT M.MEMBER_NO 
+			  ,MEMBER_ID
+			  ,MEMBER_NAME
+			  ,MEMBER_EMAIL
+			  ,MEMBER_ENROLL_DATE
+			  ,DISABLE_REASON
+		 FROM MEMBER M,DISABLE D
+		WHERE M.MEMBER_NO = D.MEMBER_NO (+) AND STATUS = 'N'
+	</entry>
+	<entry key="updateDisable">
+		UPDATE DISABLE D
+		   SET D.DISABLE_REASON = ?
+		 WHERE D.MEMBER_NO IN 
+		(SELECT M.MEMBER_NO 
+		   FROM MEMBER M
+		  WHERE M.MEMBER_NO = ?)
+	</entry>
+	<entry key="selectDisable2"> <!-- update후에 조회 -->
+		SELECT M.MEMBER_NO 
+			  ,MEMBER_ID
+		      ,MEMBER_NAME
+		      ,MEMBER_EMAIL
+		      ,MEMBER_ENROLL_DATE
+		      ,DISABLE_REASON
+		FROM MEMBER M
+			,DISABLE D
+	   WHERE M.MEMBER_NO = D.MEMBER_NO (+) 
+		 AND STATUS = 'N' 
+		 AND M.MEMBER_NO = ?
+	</entry>
+	<entry key="insertDisable">
+		INSERT INTO DISABLE (MEMBER_NO, DISABLE_REASON) 
+		VALUES (?,' ')
+	</entry>	
+	<entry key="deleteDisable">
+		DELETE FROM DISABLE 
+		 WHERE MEMBER_NO=?
+	</entry>
+</properties>

@@ -1,0 +1,502 @@
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="listCount">
+		<!-- SELECT COUNT(*) COUNT FROM POST WHERE STATUS = 'Y' AND CATEGORY_NO 
+			NOT IN() -->
+		SELECT COUNT(*) COUNT
+		FROM POST
+		JOIN CATEGORY USING(CATEGORY_NO)
+		WHERE STATUS = 'Y'
+		AND CATEGORY_NAME NOT
+		IN('자유','추천')
+	</entry>
+	<entry key="listFreeCount">
+		SELECT COUNT(*) COUNT
+		FROM POST
+		JOIN CATEGORY USING(CATEGORY_NO)
+		WHERE STATUS = 'Y'
+		AND CATEGORY_NAME ='자유'
+	</entry>
+	<entry key="listRecommendCount">
+		SELECT COUNT(*) COUNT
+		FROM POST
+		JOIN CATEGORY USING(CATEGORY_NO)
+		WHERE STATUS = 'Y'
+		AND CATEGORY_NAME ='추천'
+	</entry>
+	<entry key="listCategoryCount">
+		SELECT COUNT(*) COUNT
+		FROM POST
+		WHERE STATUS = 'Y'
+		AND CATEGORY_NO = ?
+	</entry>
+	<!-- 꿀팁 게시글 가져오기 -->
+	<entry key="selectList">
+		SELECT *
+		FROM (
+		SELECT ROWNUM RNUM,A.*
+		FROM(
+		SELECT P.POST_NO,
+		C.CATEGORY_NAME,
+		P.TITLE,
+		P.CONTENT,
+		P.COUNT,
+		P.LIKE_COUNT,
+		P.INTEREST_COUNT,
+		m.MEMBER_NICKNAME,
+		P.POST_DATE
+		FROM POST P
+		JOIN MEMBER m ON p.MEMBER_NO = m.MEMBER_NO
+		JOIN CATEGORY C ON P.CATEGORY_NO = C.CATEGORY_NO
+		WHERE P.STATUS = 'Y'
+		AND C.CATEGORY_NAME NOT IN ('자유','추천')
+		ORDER BY P.POST_NO) A
+		)
+		WHERE RNUM BETWEEN ? AND ?
+
+
+
+	</entry>
+	<!-- 자유 게시글 가져오기 -->
+	<entry key="selectFreeList">
+		SELECT *
+		FROM (
+		SELECT ROWNUM RNUM,A.*
+		FROM(
+		SELECT P.POST_NO,
+		C.CATEGORY_NAME,
+		P.TITLE,
+		P.CONTENT,
+		P.COUNT,
+		P.LIKE_COUNT,
+		P.INTEREST_COUNT,
+		m.MEMBER_NICKNAME,
+		P.POST_DATE
+		FROM POST P
+		JOIN MEMBER m ON p.MEMBER_NO = m.MEMBER_NO
+		JOIN CATEGORY C ON P.CATEGORY_NO = C.CATEGORY_NO
+		WHERE P.STATUS = 'Y'
+		AND C.CATEGORY_NAME = '자유'
+		ORDER BY P.POST_NO) A
+		)
+		WHERE RNUM BETWEEN ? AND ?
+
+
+
+	</entry>
+	<!-- 추천 게시글 가져오기 -->
+	<entry key="selectRecommendList">
+		SELECT *
+		FROM (
+		SELECT ROWNUM RNUM,A.*
+		FROM(
+		SELECT P.POST_NO,
+		C.CATEGORY_NAME,
+		P.TITLE,
+		P.CONTENT,
+		P.COUNT,
+		P.LIKE_COUNT,
+		P.INTEREST_COUNT,
+		m.MEMBER_NICKNAME,
+		P.POST_DATE
+		FROM POST P
+		JOIN MEMBER m ON p.MEMBER_NO = m.MEMBER_NO
+		JOIN CATEGORY C ON P.CATEGORY_NO = C.CATEGORY_NO
+		WHERE P.STATUS = 'Y'
+		AND C.CATEGORY_NAME = '추천'
+		ORDER BY P.POST_NO) A
+		)
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	<!-- 꿀팁 카테고리 별 게시글 가져오기 -->
+	<entry key="selectGulCategoryList">
+		SELECT *
+		FROM (
+		SELECT ROWNUM RNUM,A.*
+		FROM(
+		SELECT P.POST_NO,
+		C.CATEGORY_NAME,
+		P.TITLE,
+		P.CONTENT,
+		P.COUNT,
+		P.LIKE_COUNT,
+		P.INTEREST_COUNT,
+		m.MEMBER_NICKNAME,
+		P.POST_DATE
+		FROM POST P
+		JOIN MEMBER m ON p.MEMBER_NO = m.MEMBER_NO
+		JOIN CATEGORY C ON P.CATEGORY_NO = C.CATEGORY_NO
+		WHERE P.STATUS = 'Y'
+		AND P.CATEGORY_NO = ?
+		ORDER BY P.POST_NO) A
+		)
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	<!-- 게시글 조회수 올리기 -->
+	<entry key="increaseCount">
+		UPDATE POST
+		SET COUNT = COUNT + 1
+		WHERE POST_NO = ?
+		AND STATUS = 'Y'
+	</entry>
+	<entry key="selectPost">
+		SELECT P.POST_NO,
+		C.CATEGORY_NAME,
+		P.TITLE,
+		P.CONTENT,
+		M.MEMBER_NICKNAME,
+		P.POST_DATE,
+		P.COUNT,
+		P.LIKE_COUNT,
+		P.INTEREST_COUNT,
+		A.REF_BNO,
+		A.ORIGIN_NAME,
+		A.CHANGE_NAME,
+		A.FILE_PATH,
+		P.REPORT_COUNT
+		FROM POST P
+		JOIN MEMBER M ON P.MEMBER_NO = M.MEMBER_NO
+		JOIN CATEGORY C
+		ON P.CATEGORY_NO = C.CATEGORY_NO
+		LEFT JOIN ATTACHMENT A ON P.POST_NO =
+		A.REF_BNO
+		WHERE P.POST_NO = ?
+		AND P.STATUS = 'Y'
+	</entry>
+	<!-- 업데이트 -->
+	<entry key="updatePost">
+		UPDATE POST
+		SET TITLE = ?
+		,CONTENT = ?
+		,CATEGORY_NO = ?
+		WHERE POST_NO = ?
+		AND STATUS = 'Y'
+	</entry>
+	<entry key="updateAttachment">
+		UPDATE ATTACHMENT
+		SET ORIGIN_NAME = ?
+		,CHANGE_NAME = ?
+		,FILE_PATH = ?
+		,UPLOAD_DATE = SYSDATE
+		WHERE FILE_NO = ?
+		AND STATUS = 'Y'
+	</entry>
+	<entry key="insertNewAttachment">
+		INSERT INTO ATTACHMENT(FILE_NO
+		,REF_BNO
+		,ORIGIN_NAME
+		,CHANGE_NAME
+		,FILE_PATH)
+		VALUES(SEQ_FNO.NEXTVAL
+		,?
+		,?
+		,?
+		,?)
+	</entry>
+	<entry key="selectCategoryList">
+		SELECT CATEGORY_NO
+		,CATEGORY_NAME
+		FROM CATEGORY
+	</entry>
+	<!-- 삭제 -->
+	<entry key="deletePost">
+		UPDATE POST
+		SET STATUS = 'N'
+		WHERE POST_NO = ?
+		AND STATUS = 'Y'
+	</entry>
+	<!-- 댓글 -->
+	<entry key="insertComment">
+		INSERT INTO COMMENT_TABLE(COMMENT_NO,
+		POST_NO,
+		COMMENT_WRITER_NO,
+		COMMENT_CONTENT)
+		VALUES (SEQ_CNO.NEXTVAL,
+		?,
+		?,
+		?)
+	</entry>
+
+	<!-- 댓글 select -->
+	<entry key="selectCommentList">
+		SELECT COMMENT_NO
+		, MEMBER_NICKNAME
+		, COMMENT_CONTENT
+		, COMMENT_DATE
+		FROM COMMENT_TABLE C
+		JOIN MEMBER M ON(M.MEMBER_NO =
+		C.COMMENT_WRITER_NO)
+		WHERE POST_NO = ?
+	</entry>
+
+
+	<!-- 댓글 update -->
+	<entry key="updateComment">
+		UPDATE COMMENT_TABLE
+		SET COMMENT_CONTENT = ?
+		WHERE
+		POST_NO = ?
+		AND COMMENT_NO = ?
+	</entry>
+
+	<!-- 댓글 delete -->
+	<entry key="deleteComment">
+		DELETE
+		FROM COMMENT_TABLE
+		WHERE POST_NO = ?
+		AND COMMENT_NO = ?
+	</entry>
+
+
+	<!-- 게시글 작성 -->
+	<entry key="insertPost">
+		INSERT INTO POST (POST_NO
+		, MEMBER_NO
+		, CATEGORY_NO
+		,
+		TITLE
+		, CONTENT)
+		VALUES (SEQ_PNO.NEXTVAL
+		, ?
+		, ?
+		, ?
+		, ?)
+	</entry>
+
+
+	<!-- 첨부파일 등록 -->
+	<entry key="insertAttachment">
+		INSERT INTO ATTACHMENT(FILE_NO
+		,REF_BNO
+		,ORIGIN_NAME
+		,CHANGE_NAME
+		,FILE_PATH)
+		VALUES(SEQ_FNO.NEXTVAL
+		,SEQ_PNO.CURRVAL
+		,?
+		,?
+		,?)
+	</entry>
+
+	<!-- 첨부파일 조회 -->
+	<entry key="selectAttachment">
+		SELECT FILE_NO
+		,ORIGIN_NAME
+		,CHANGE_NAME
+		,FILE_PATH
+		FROM ATTACHMENT
+		WHERE REF_BNO = ?
+	</entry>
+
+	<entry key="selectTitlePost">
+		SELECT P.POST_NO, C.CATEGORY_NAME, P.TITLE, P.CONTENT, P.COUNT,
+		M.MEMBER_NICKNAME, P.POST_DATE
+		FROM POST P
+		JOIN MEMBER M ON (P.MEMBER_NO = M.MEMBER_NO)
+		JOIN CATEGORY C ON (P.CATEGORY_NO = C.CATEGORY_NO)
+		WHERE P.TITLE LIKE ?
+		AND P.STATUS = 'Y'
+	</entry>
+
+	<entry key="selectContentPost">
+		SELECT P.POST_NO, C.CATEGORY_NAME, P.TITLE, P.CONTENT, P.COUNT,
+		M.MEMBER_NICKNAME, P.POST_DATE
+		FROM POST P
+		JOIN MEMBER M ON (P.MEMBER_NO = M.MEMBER_NO)
+		JOIN CATEGORY C ON (P.CATEGORY_NO = C.CATEGORY_NO)
+		WHERE P.CONTENT LIKE ?
+		AND P.STATUS = 'Y'
+	</entry>
+
+	<entry key="selectNicknamePost">
+		SELECT P.POST_NO, C.CATEGORY_NAME, P.TITLE, P.CONTENT, P.COUNT,
+		M.MEMBER_NICKNAME, P.POST_DATE
+		FROM POST P
+		JOIN MEMBER M ON (P.MEMBER_NO = M.MEMBER_NO)
+		JOIN CATEGORY C ON
+		(P.CATEGORY_NO = C.CATEGORY_NO)
+		WHERE M.MEMBER_NICKNAME LIKE ?
+		AND P.STATUS = 'Y'
+	</entry>
+
+	<entry key="selectTitleContentPost">
+		SELECT P.POST_NO, C.CATEGORY_NAME, P.TITLE, P.CONTENT, P.COUNT,
+		M.MEMBER_NICKNAME, P.POST_DATE
+		FROM POST P
+		JOIN MEMBER M ON (P.MEMBER_NO = M.MEMBER_NO)
+		JOIN CATEGORY C ON (P.CATEGORY_NO = C.CATEGORY_NO)
+		WHERE (TITLE LIKE ? OR CONTENT LIKE ?)
+		AND P.STATUS = 'Y'
+	</entry>
+
+
+	<!-- 조회수 기준으로 정렬한 리스트 가져오기 -->
+	<entry key="selectPopularListByCount">
+		SELECT *
+		FROM (
+		SELECT ROWNUM RNUM,A.*
+		FROM(
+		SELECT P.POST_NO,
+		C.CATEGORY_NAME,
+		P.TITLE,
+		P.CONTENT,
+		P.COUNT,
+		P.LIKE_COUNT,
+		P.INTEREST_COUNT,
+		m.MEMBER_NICKNAME,
+		P.POST_DATE
+		FROM POST P
+		JOIN MEMBER m ON p.MEMBER_NO = m.MEMBER_NO
+		JOIN CATEGORY C ON P.CATEGORY_NO = C.CATEGORY_NO
+		WHERE P.STATUS = 'Y'
+		ORDER BY COUNT DESC) A
+		)
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	<!-- 좋아요 수 기준으로 정렬한 리스트 가져오기 -->
+	<entry key="selectPopularListByLikeCount">
+		SELECT *
+		FROM (
+		SELECT ROWNUM RNUM,A.*
+		FROM(
+		SELECT P.POST_NO,
+		C.CATEGORY_NAME,
+		P.TITLE,
+		P.CONTENT,
+		P.COUNT,
+		P.LIKE_COUNT,
+		P.INTEREST_COUNT,
+		m.MEMBER_NICKNAME,
+		P.POST_DATE
+		FROM POST P
+		JOIN MEMBER m ON p.MEMBER_NO = m.MEMBER_NO
+		JOIN CATEGORY C ON P.CATEGORY_NO = C.CATEGORY_NO
+		WHERE P.STATUS = 'Y'
+		ORDER BY LIKE_COUNT DESC) A
+		)
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	<!-- 관심글 수 기준으로 정렬한 리스트 가져오기 -->
+	<entry key="selectPopularListByInterCount">
+		SELECT *
+		FROM (
+		SELECT ROWNUM RNUM,A.*
+		FROM(
+		SELECT P.POST_NO,
+		C.CATEGORY_NAME,
+		P.TITLE,
+		P.CONTENT,
+		P.COUNT,
+		P.LIKE_COUNT,
+		P.INTEREST_COUNT,
+		m.MEMBER_NICKNAME,
+		P.POST_DATE
+		FROM POST P
+		JOIN MEMBER m ON p.MEMBER_NO = m.MEMBER_NO
+		JOIN CATEGORY C ON P.CATEGORY_NO = C.CATEGORY_NO
+		WHERE P.STATUS = 'Y'
+		ORDER BY INTEREST_COUNT DESC) A
+		)
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+
+	<!-- 게시물 상세정보에 들어갔을 때 내가 좋아요를 한 게시물인지 아닌지 확인 -->
+	<entry key="isLike">
+		SELECT COUNT(*) COUNT
+		FROM LIKE_POST
+		WHERE MEMBER_NO = ?
+		AND POST_NO = ?
+	</entry>
+
+	<!-- 좋아요 테이블에 값 넣기 -->
+	<entry key="insertLikeTable">
+		INSERT INTO LIKE_POST
+		VALUES(?,?)
+	</entry>
+	<!-- 좋아요 테이블에서 지우기 -->
+	<entry key="deleteFromLikeTable">
+		DELETE LIKE_POST
+		WHERE POST_NO = ?
+		AND MEMBER_NO = ?
+	</entry>
+	<!-- 좋아요 카운트 내리기 -->
+	<entry key="decreaseLikeCount">
+		UPDATE POST
+		SET LIKE_COUNT = LIKE_COUNT - 1
+		WHERE
+		POST_NO = ?
+		AND STATUS = 'Y'
+	</entry>
+
+	<!-- 게시물 상세정보에 들어갔을 때 내가 관심표시를 한 게시물인지 아닌지 확인 -->
+	<entry key="isInterest">
+		SELECT COUNT(*) COUNT
+		FROM INTEREST_POST
+		WHERE MEMBER_NO
+		= ?
+		AND POST_NO = ?
+	</entry>
+	<!-- 관심 테이블에 값 넣기 -->
+	<entry key="insertInterestTable">
+		INSERT INTO INTEREST_POST
+		VALUES(?,?,NULL)
+	</entry>
+	<!-- 관심 테이블에서 지우기 -->
+	<entry key="deleteFromInterestTable">
+		DELETE INTEREST_POST
+		WHERE POST_NO = ?
+		AND MEMBER_NO = ?
+	</entry>
+	<!-- 관심 카운트 내리기 -->
+	<entry key="decreaseInterestCount">
+		UPDATE POST
+		SET INTEREST_COUNT = INTEREST_COUNT - 1
+		WHERE POST_NO = ?
+		AND STATUS = 'Y'
+	</entry>
+
+	<!-- 카테고리 리스트 가져오기 -->
+	<entry key="getCategoryList">
+		SELECT *
+		FROM CATEGORY
+	</entry>
+	<!-- Attachment 테이블 내 REF_BNO 가져오기(게시글 리스트중에 Attachment테이블 내 REF_BNO와 게시물 
+		번호가 일치한다면 사진게시물이 있는 게시글이란 뜻이기 때문에 사진 아이콘을 붙여주기 위해 -->
+	<entry key="getAttachmentRefBno">
+		SELECT REF_BNO
+		FROM ATTACHMENT
+		WHERE FILE_LEVEL = 0
+		AND
+		STATUS = 'Y'
+	</entry>
+	<entry key="insertReportTable">
+		INSERT INTO POST_REPORT
+			VALUES(?, ?, SYSDATE, ?)
+	</entry>
+	
+	<entry key="reportIslike">
+		SELECT COUNT(*) COUNT
+		FROM POST_REPORT
+		WHERE MEMBER_NO = ?
+		AND POST_NO = ?
+	</entry>
+	
+	<entry key="deleteFromReportTable">
+		DELETE POST_REPORT
+		WHERE MEMBER_NO = ?
+		AND POST_NO = ?
+	</entry>
+	
+	<entry key="decreaseReportCount">
+		UPDATE POST
+		SET REPORT_COUNT = REPORT_COUNT - 1
+		WHERE POST_NO = ?
+		AND STATUS = 'Y'
+	</entry>
+	<entry key="increaseReportCount">
+		UPDATE POST
+		SET REPORT_COUNT = REPORT_COUNT + 1
+		WHERE POST_NO = ?
+		AND STATUS = 'Y'
+	</entry>
+</properties>
